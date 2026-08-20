@@ -1,23 +1,17 @@
 # bt-net-assignment-master
 
-Create a Products API which returns data using proper REST syntax, e.g.
+# Solution
+Two ASP.NET Core services:
 
-GET /products should return a list of products
-GET /products/1 should return the product with id = 1
-POST /products should create a product and return the path to said product
-You should use some sort of database and add seed functionality to add some initial dummy data.
+- **ProductsApi** - REST API backed by an EF Core InMemory database, seeded on startup with data from fakestoreapi.com (https://fakestoreapi.com/products).
+  - GET /products - list all products
+  - GET /products/{id} - get a single product
+  - POST /products - create a product, returns 201 with the path to the new resource
+  - PUT /products/{id} - update
+  - DELETE /products/{id} - delete
 
-You can use data from https://fakestoreapi.com/products if you can't come up with something yourself :)
+- **Gateway** - forwards requests over HTTP to ProductsApi and returns the response.
+- 
+## Middleware
 
-Now, create a second service which stands as a gateway to the API, so calls comes through the gateway, routes to API, responds to user.
-
-E.g.:
-
-User requests GET /api/products
-Gateway receives the call and requests the products API
-GET /products
-Products API returns data to gateway
-Gateway returns data to user.
-What communication type you use is up to you (HTTP, gRPC, etc.)
-
-As the last part, create a middleware in the gateway, which logs the time used to process the entire request
+The Gateway includes middleware that logs how long each request takes in ms, logged as: "[Method] [Path] responded [StatusCode] in [Elapsedmillieseconds]"
