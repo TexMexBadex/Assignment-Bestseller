@@ -11,7 +11,7 @@ Two ASP.NET Core services:
   - DELETE /products/{id} - delete
 
 - **Gateway** - forwards requests over HTTP to ProductsApi and returns the response.
-- 
+
 ## Middleware
 
 The Gateway includes middleware that logs how long each request takes in ms, logged as: "[Method] [Path] responded [StatusCode] in [Elapsedmillieseconds]"
