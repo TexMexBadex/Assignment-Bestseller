@@ -1,0 +1,36 @@
+@Gateway_HostAddress = https://localhost:7163
+
+@id=11
+DELETE {{Gateway_HostAddress}}/api/gateway/{{id}}
+
+###
+
+PUT {{Gateway_HostAddress}}/api/gateway/{{id}}
+Content-Type: application/json
+
+
+###
+
+GET {{Gateway_HostAddress}}/api/gateway
+Content-Type: application/json
+
+###
+@id=11
+GET {{Gateway_HostAddress}}/api/gateway/{{id}}
+Content-Type: application/json
+
+###
+
+POST {{Gateway_HostAddress}}/api/gateway
+Content-Type: application/json
+{
+  "id": 11,
+  "title": "A whole new backpack!",
+  "price": 50.00,
+  "description": "The best of the best!",
+  "category": "men's clothing",
+  "image": "https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg"
+}
+
+
+###
