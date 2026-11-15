@@ -18,6 +18,7 @@ The core REST API that manages products using an in-memory database.
 
 **Security:** 
 The API requires an `X-Gateway-Key` header on all requests. Direct calls without this key are rejected with 401 Unauthorized. This ensures the API can only be accessed through the Gateway.
+For the purpose of this application, the key is in appsettings.json, but for real life scenarios it should be stored in a secure location e.g. a Key Vault.
 
 **Database:** 
 Uses EF Core's in-memory database. On startup, the `DbSeeder` automatically populates the database with 10 products from fakestoreapi.com.
