@@ -9,19 +9,32 @@ public static class GatewayModule
     var products = app.MapGroup("/products");
 
     products.MapGet("", (HttpContext context, IHttpClientFactory factory) =>
-      ForwardAsync(context, factory, HttpMethod.Get, "products"));
+      ForwardAsync(context, factory, HttpMethod.Get, "products"))
+      .WithName("GetAllProducts")
+      .Produces(200);
 
     products.MapGet("/{id:int}", (int id, HttpContext context, IHttpClientFactory factory) =>
-      ForwardAsync(context, factory, HttpMethod.Get, $"products/{id}"));
+      ForwardAsync(context, factory, HttpMethod.Get, $"products/{id}"))
+      .WithName("GetProductById")
+      .Produces(200)
+      .Produces(404);
 
     products.MapPost("", (HttpContext context, IHttpClientFactory factory) =>
-      ForwardAsync(context, factory, HttpMethod.Post, "products", copyRequestBody: true));
+      ForwardAsync(context, factory, HttpMethod.Post, "products", copyRequestBody: true))
+      .WithName("CreateProduct")
+      .Produces(201);
 
     products.MapPut("/{id:int}", (int id, HttpContext context, IHttpClientFactory factory) =>
-      ForwardAsync(context, factory, HttpMethod.Put, $"products/{id}", copyRequestBody: true));
+      ForwardAsync(context, factory, HttpMethod.Put, $"products/{id}", copyRequestBody: true))
+      .WithName("UpdateProduct")
+      .Produces(204)
+      .Produces(404);
 
     products.MapDelete("/{id:int}", (int id, HttpContext context, IHttpClientFactory factory) =>
-      ForwardAsync(context, factory, HttpMethod.Delete, $"products/{id}"));
+      ForwardAsync(context, factory, HttpMethod.Delete, $"products/{id}"))
+      .WithName("DeleteProduct")
+      .Produces(204)
+      .Produces(404);
 
     return app;
   }

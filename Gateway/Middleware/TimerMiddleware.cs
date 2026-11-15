@@ -14,7 +14,7 @@ public class TimerMiddleware(RequestDelegate next, ILogger<TimerMiddleware> logg
     await _next(context);
     stopwatch.Stop();
 
-    _logger.LogInformation("[{Method}] [{Path}] responded [{Statuscode}] in [{Elapsedmillisecons}ms]",
+    _logger.LogInformation("[{Method}] [{Path}] responded [{StatusCode}] in [{ElapsedMilliseconds}ms]",
     context.Request.Method,
     context.Request.Path,
     context.Response.StatusCode,

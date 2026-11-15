@@ -8,7 +8,10 @@ using Products.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
-builder.Services.AddDbContextFactory<AppDbContext>(options => options.UseInMemoryDatabase("ProductsDb"));
+builder.Services.AddProblemDetails();
+builder.Services.AddValidation();
+var databaseName = builder.Configuration["DatabaseName"] ?? "ProductsDb";
+builder.Services.AddDbContextFactory<AppDbContext>(options => options.UseInMemoryDatabase(databaseName));
 builder.Services.AddScoped<IRepository<Product>, Repository<Product>>();
 builder.Services.AddScoped<IProductService, ProductService>();
 

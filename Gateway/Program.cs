@@ -18,8 +18,8 @@ if (app.Environment.IsDevelopment())
   app.MapOpenApi();
 }
 
-app.UseMiddleware<TimerMiddleware>();
 app.UseHttpsRedirection();
+app.UseMiddleware<TimerMiddleware>();
 app.MapGatewayEndpoints();
 
 app.Run();
