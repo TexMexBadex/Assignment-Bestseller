@@ -1,34 +1,48 @@
 using Microsoft.EntityFrameworkCore;
 using Products.Data;
+using Products.Models;
+using Products.Modules;
+using Products.Repositories;
+using Products.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
-builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
-
-builder.Services.AddDbContext<AppDbContext>(options => options.UseInMemoryDatabase("ProductsDb"));
+builder.Services.AddDbContextFactory<AppDbContext>(options => options.UseInMemoryDatabase("ProductsDb"));
+builder.Services.AddScoped<IRepository<Product>, Repository<Product>>();
+builder.Services.AddScoped<IProductService, ProductService>();
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
+await using (var scope = app.Services.CreateAsyncScope())
 {
-  var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+  var factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<AppDbContext>>();
+  await using var db = await factory.CreateDbContextAsync();
   DbSeeder.Seed(db);
 }
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
   app.MapOpenApi();
 }
 
 app.UseHttpsRedirection();
+app.MapProductsEndpoints();
 
-app.UseAuthorization();
+//Check if the request has the correct gateway key in the headers to make sure 
+// API is called only through the gateway
+app.Use(async (context, next) =>
+{
+  var expected = app.Configuration["GatewayKey"];
 
-app.MapControllers();
+  if (string.IsNullOrEmpty(expected) ||
+      context.Request.Headers["X-Gateway-Key"] != expected)
+  {
+    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+    return;
+  }
+
+  await next();
+});
 
 app.Run();

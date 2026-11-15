@@ -1,29 +1,25 @@
 using Gateway.Middleware;
+using Gateway.Modules;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
-builder.Services.AddHttpClient();
-builder.Services.AddControllers();
-
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+builder.Services.AddHttpClient("ProductsApi", client =>
+{
+  client.BaseAddress = new Uri("https://localhost:7169/");
+  client.DefaultRequestHeaders.Add("X-Gateway-Key", builder.Configuration["GatewayKey"]);
+});
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
   app.MapOpenApi();
 }
 
 app.UseMiddleware<TimerMiddleware>();
-
 app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
-app.MapControllers();
+app.MapGatewayEndpoints();
 
 app.Run();

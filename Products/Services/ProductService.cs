@@ -4,27 +4,17 @@ using Products.Repositories;
 
 namespace Products.Services;
 
-public class ProductService : IProductService
+public class ProductService(IRepository<Product> repository) : IProductService
 {
-  private readonly IRepository<Product> _repository;
-
-  public ProductService(IRepository<Product> repository)
-  {
-    _repository = repository;
-  }
-
   public async Task<ProductDto?> GetProductByIdAsync(int id)
   {
-    var product = await _repository.GetByIdAsync(id);
-    if (product is null)
-      return null;
-
-    return MapToDto(product);
+    var product = await repository.GetByIdAsync(id);
+    return product is null ? null : MapToDto(product);
   }
 
   public async Task<IEnumerable<ProductDto>> GetAllProductsAsync()
   {
-    var products = await _repository.GetAllAsync();
+    var products = await repository.GetAllAsync();
     return products.Select(MapToDto);
   }
 
@@ -39,13 +29,15 @@ public class ProductService : IProductService
       Image = request.Image
     };
 
-    await _repository.AddAsync(product);
+    await repository.AddAsync(product);
     return MapToDto(product);
   }
 
-  public async Task UpdateProductAsync(int id, CreateProductDto request)
+  public async Task<bool> UpdateProductAsync(int id, CreateProductDto request)
   {
-    var product = await _repository.GetByIdAsync(id) ?? throw new KeyNotFoundException($"Product with id {id} not found");
+    var product = await repository.GetByIdAsync(id);
+    if (product is null)
+      return false;
 
     product.Title = request.Title;
     product.Price = request.Price;
@@ -53,24 +45,27 @@ public class ProductService : IProductService
     product.Category = request.Category;
     product.Image = request.Image;
 
-    await _repository.UpdateAsync(product);
+    await repository.UpdateAsync(product);
+    return true;
   }
 
-  public async Task DeleteProductAsync(int id)
+  public async Task<bool> DeleteProductAsync(int id)
   {
-    var product = await _repository.GetByIdAsync(id) ?? throw new KeyNotFoundException($"Product with id {id} not found");
-    await _repository.DeleteAsync(product);
+    var product = await repository.GetByIdAsync(id);
+    if (product is null)
+      return false;
+
+    await repository.DeleteAsync(product);
+    return true;
   }
 
-  private static ProductDto MapToDto(Product product)
+  private static ProductDto MapToDto(Product product) => new()
   {
-    return new ProductDto
-    {
-      Title = product.Title,
-      Price = product.Price,
-      Description = product.Description,
-      Category = product.Category,
-      Image = product.Image
-    };
-  }
+    Id = product.Id,
+    Title = product.Title,
+    Price = product.Price,
+    Description = product.Description,
+    Category = product.Category,
+    Image = product.Image
+  };
 }
